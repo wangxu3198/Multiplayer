@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SphereComponent.h"
 #include "MP_Actor.generated.h"
+
 
 UCLASS()
 class MP_CPP_API AMP_Actor : public AActor
@@ -15,12 +17,19 @@ public:
 	// Sets default values for this actor's properties
 	AMP_Actor();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+private:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> SphereMesh;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USphereComponent> SphereCollision;
 };

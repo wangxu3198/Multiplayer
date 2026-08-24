@@ -2,6 +2,8 @@
 
 
 #include "Actors/MP_Actor.h"
+#include "Components/StaticMeshComponent.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 AMP_Actor::AMP_Actor()
@@ -18,6 +20,15 @@ AMP_Actor::AMP_Actor()
 		SetReplicateMovement(true);
 	*/
 	SetReplicatingMovement(true);
+
+	SphereMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SphereMesh"));
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+	SetRootComponent(SphereMesh);
+	SphereCollision->SetupAttachment(RootComponent);
+	SphereMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	SphereMesh->SetGenerateOverlapEvents(false);
+	SphereMesh->SetIsReplicated(true);
 	
 }
 
@@ -36,5 +47,17 @@ void AMP_Actor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMP_Actor::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	Super::NotifyActorBeginOverlap(OtherActor);
+
+	ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
+	if (HasAuthority() && IsValid(OverlappedCharacter)) {
+		//AttachToActor(OtherActor, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		SphereMesh->AttachToComponent(OverlappedCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "S_Head");
+	}
+		
 }
 
