@@ -32,4 +32,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USphereComponent> SphereCollision;
+
+	UPROPERTY(EditAnywhere)
+	float ArmorValue = 100.f;
 };

@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -54,6 +55,16 @@ AMP_CPPCharacter::AMP_CPPCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
+USkeletalMeshComponent* AMP_CPPCharacter::GetSkeletalMeshComponent_Implementation() const
+{
+	return GetMesh();
+}
+
+void AMP_CPPCharacter::GrantArmor_Implementation(float ArmorAmount)
+{
+	Armor = ArmorAmount;
+}
+
 void AMP_CPPCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -67,6 +78,13 @@ void AMP_CPPCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+}
+
+void AMP_CPPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(AMP_CPPCharacter, Armor);
 }
 
 //////////////////////////////////////////////////////////////////////////

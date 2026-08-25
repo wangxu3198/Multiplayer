@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Interaction/MP_Player.h"
 #include "MP_CPPCharacter.generated.h"
 
 class USpringArmComponent;
@@ -16,7 +17,7 @@ struct FInputActionValue;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class AMP_CPPCharacter : public ACharacter
+class AMP_CPPCharacter : public ACharacter, public IMP_Player
 {
 	GENERATED_BODY()
 
@@ -47,6 +48,9 @@ class AMP_CPPCharacter : public ACharacter
 public:
 	AMP_CPPCharacter();
 	
+	virtual USkeletalMeshComponent* GetSkeletalMeshComponent_Implementation() const override;
+
+	virtual void GrantArmor_Implementation(float ArmorAmount) override;
 
 protected:
 
@@ -69,5 +73,18 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	//复制Armor属性值的步骤
+	/*
+		1.override GetLifetimeReplicatedProps函数（public）
+		2.U属性宏带复制标记(UPROPERTY(Replicated))
+		3.在get lifetime replicated props中调用宏执行do rep lifetime(#include "Net/UnrealNetwork.h")
+	*/
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+private:
+	UPROPERTY(Replicated)
+	float Armor = 0.f;
 };
 

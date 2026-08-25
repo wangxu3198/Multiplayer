@@ -4,6 +4,7 @@
 #include "Actors/MP_Actor.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
+#include "Interaction/MP_Player.h"
 
 // Sets default values
 AMP_Actor::AMP_Actor()
@@ -53,10 +54,19 @@ void AMP_Actor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
-	ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
-	if (HasAuthority() && IsValid(OverlappedCharacter)) {
+	/*
+		是否实现接口的实现
+		1.OtherActor->GetClass()->ImplementsInterface(UMP_Player::StaticClass());
+		2.OtherActor->Implements<UMP_Player>();
+	*/
+	
+	if (HasAuthority() && OtherActor->Implements<UMP_Player>()) {
+
+		USkeletalMeshComponent* SkeletalMeshComponent = IMP_Player::Execute_GetSkeletalMeshComponent(OtherActor);
+		IMP_Player::Execute_GrantArmor(OtherActor, ArmorValue);
+
 		//AttachToActor(OtherActor, FAttachmentTransformRules::SnapToTargetIncludingScale);
-		SphereMesh->AttachToComponent(OverlappedCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "S_Head");
+		SphereMesh->AttachToComponent(SkeletalMeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "S_Head");
 	}
 		
 }
