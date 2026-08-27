@@ -65,6 +65,11 @@ void AMP_CPPCharacter::GrantArmor_Implementation(float ArmorAmount)
 	Armor = ArmorAmount;
 }
 
+void AMP_CPPCharacter::IncrementPickupCount_Implementation()
+{
+	PickupCount++;
+}
+
 void AMP_CPPCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -85,6 +90,21 @@ void AMP_CPPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(AMP_CPPCharacter, Armor);
+	DOREPLIFETIME(AMP_CPPCharacter, PickupCount)
+}
+
+void AMP_CPPCharacter::OnRep_Armor()
+{
+	//RepNotify = “收到网络同步数据包之后” 的回调。谁收到同步包，谁执行；本机直接改值，不触发。
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Armor: %f"), Armor));
+}
+
+void AMP_CPPCharacter::OnRep_PickupCount(int PreviousValue)
+{
+	//int类型的复制通知函数可以带参数，参数是同步前的值。
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("PreviousValue: %d"), PreviousValue));
+	//RepNotify = “收到网络同步数据包之后” 的回调。谁收到同步包，谁执行；本机直接改值，不触发。
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PickupCount: %d"), PickupCount));
 }
 
 //////////////////////////////////////////////////////////////////////////

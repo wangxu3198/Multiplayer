@@ -52,6 +52,8 @@ public:
 
 	virtual void GrantArmor_Implementation(float ArmorAmount) override;
 
+	virtual void IncrementPickupCount_Implementation() override;
+
 protected:
 
 	/** Called for movement input */
@@ -83,8 +85,19 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+
 private:
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_Armor)
 	float Armor = 0.f;
+
+	UPROPERTY(ReplicatedUsing = OnRep_PickupCount)
+	int PickupCount = 0;
+
+	UFUNCTION()
+	void OnRep_Armor();
+
+	UFUNCTION()
+	void OnRep_PickupCount(int PreviousValue);
+
 };
 
