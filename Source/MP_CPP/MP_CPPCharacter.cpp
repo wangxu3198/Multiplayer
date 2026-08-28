@@ -89,7 +89,7 @@ void AMP_CPPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
-	DOREPLIFETIME(AMP_CPPCharacter, Armor);
+	DOREPLIFETIME_CONDITION(AMP_CPPCharacter, Armor, COND_AutonomousOnly);
 	DOREPLIFETIME(AMP_CPPCharacter, PickupCount)
 }
 
