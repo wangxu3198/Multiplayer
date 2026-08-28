@@ -70,6 +70,16 @@ void AMP_CPPCharacter::IncrementPickupCount_Implementation()
 	PickupCount++;
 }
 
+void AMP_CPPCharacter::Jump()
+{
+	Super::Jump();
+
+	if (!HasAuthority()) return;
+	bReplicatePickupCount = !bReplicatePickupCount;
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("bReplicatePickupCount: %d"), bReplicatePickupCount));
+}
+
 void AMP_CPPCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -90,7 +100,18 @@ void AMP_CPPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME_CONDITION(AMP_CPPCharacter, Armor, COND_AutonomousOnly);
-	DOREPLIFETIME(AMP_CPPCharacter, PickupCount)
+	//DOREPLIFETIME(AMP_CPPCharacter, PickupCount);
+	DOREPLIFETIME_CONDITION(AMP_CPPCharacter, PickupCount, COND_Custom);
+}
+
+void AMP_CPPCharacter::PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker)
+{
+	Super::PreReplication(ChangedPropertyTracker);
+
+	//建立bool变量和复制变量的关系（复制条件的自定义条件）
+	//bReplicatePickupCount = true则复制，= false则不复制
+	//若想让该宏起作用还需添加NetCore模块
+	DOREPLIFETIME_ACTIVE_OVERRIDE(AMP_CPPCharacter, PickupCount, bReplicatePickupCount)
 }
 
 void AMP_CPPCharacter::OnRep_Armor()
@@ -117,7 +138,7 @@ void AMP_CPPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMP_CPPCharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMP_CPPCharacter::Move);

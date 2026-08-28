@@ -54,6 +54,8 @@ public:
 
 	virtual void IncrementPickupCount_Implementation() override;
 
+	virtual void Jump() override;
+
 protected:
 
 	/** Called for movement input */
@@ -70,6 +72,7 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -85,6 +88,19 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	//自定义条件
+	/*
+		1.设定一个bool变量
+		2.override PreReplication函数
+		3.PreReplication中调用宏DOREPLIFETIME_ACTIVE_OVERRIDE（需要NetCore模块）
+
+		注意：
+			1.bool值仅在服务器上有效，因为PreReplication是服务器才调用的函数
+			2.当停止复制时更改值，之后在恢复复制时服务器值将同步并修正客户端版本的值
+			3.这个功能非常强大，如果频繁变化可能会很耗资源
+	*/
+
+	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;
 
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Armor)
@@ -92,6 +108,8 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_PickupCount)
 	int PickupCount = 0;
+
+	bool bReplicatePickupCount = true;
 
 	UFUNCTION()
 	void OnRep_Armor();
