@@ -6,7 +6,9 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "Interaction/MP_Player.h"
+#include <Components/MP_HealthComponent.h>
 #include "MP_CPPCharacter.generated.h"
+
 
 class USpringArmComponent;
 class UCameraComponent;
@@ -116,6 +118,19 @@ private:
 
 	UFUNCTION()
 	void OnRep_PickupCount(int PreviousValue);
+
+
+	//复制组件和变量不同
+	/*
+		多种方式实现该复制
+		1.进入健康组件，在其构造函数中设置复制属性SetIsReplicatedByDefault(true)
+		2.在创建他的地方调用SetIsReplicated(true)
+		3.蓝图中的Component Replicates
+
+		注：**`CreateDefaultSubobject` 创建出来的组件，Owner 自动就是当前这个 `AMP_CPPCharacter`（你的 Character Actor）**。
+	*/
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UMP_HealthComponent> HealthComponent;
 
 };
 

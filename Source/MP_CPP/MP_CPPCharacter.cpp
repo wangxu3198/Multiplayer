@@ -53,6 +53,9 @@ AMP_CPPCharacter::AMP_CPPCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+	
+	HealthComponent = CreateDefaultSubobject<UMP_HealthComponent>("HealthComponent");
+	HealthComponent->SetIsReplicated(true);
 }
 
 USkeletalMeshComponent* AMP_CPPCharacter::GetSkeletalMeshComponent_Implementation() const
