@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "Interaction/MP_Player.h"
-#include <Components/MP_HealthComponent.h>
+#include "Components/MP_HealthComponent.h"
 #include "MP_CPPCharacter.generated.h"
 
 
@@ -74,6 +74,7 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
+	void OnRPCDelayTimer();
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -105,6 +106,8 @@ public:
 	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;
 
 private:
+	FTimerHandle RPCDelayTimer;
+
 	UPROPERTY(ReplicatedUsing = OnRep_Armor)
 	float Armor = 0.f;
 
@@ -132,5 +135,23 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UMP_HealthComponent> HealthComponent;
 
+	//服务器上调用一个函数，并让它在拥有者客户端执行
+	/*
+		一个可复制函数也称为远程过程调用简称RPC
+		RPC(Remote Procedure Call)三种类型：
+			1.Client
+			2.Server
+			3.NetMulticast:网络多播
+
+		客户端RPC
+		UFUNCTION(Client, Reliable)
+			Reliable:可靠的。它将在远程机器上保证执行
+			
+	*/
+
+	//它们可以有输入参数，因此可以接收数据。这些数据将通过网络传输
+	//Client_PrintMessage_Implementation：实现的名
+	UFUNCTION(Client, Reliable)
+	void Client_PrintMessage(const FString& Message);
 };
 

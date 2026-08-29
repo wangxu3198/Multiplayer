@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "Net/UnrealNetwork.h"
 
+
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -96,6 +97,20 @@ void AMP_CPPCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	GetWorldTimerManager().SetTimer(RPCDelayTimer, this, &AMP_CPPCharacter::OnRPCDelayTimer, 4.0f, false);
+
+}
+
+void AMP_CPPCharacter::OnRPCDelayTimer()
+{
+	//在Begin中执行时都在服务器运行
+	//有时开始播放太早，还没有拥有网络连接。我们必须确保已建立连接，以确保RPC正常工作。
+	//具体方法取决于游戏和玩法机制，我们将简单设置一个计时器，在八秒后运行此函数
+	if (HasAuthority()) {
+
+		Client_PrintMessage("This should run on owning client.");
+	}
 }
 
 void AMP_CPPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -129,6 +144,14 @@ void AMP_CPPCharacter::OnRep_PickupCount(int PreviousValue)
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("PreviousValue: %d"), PreviousValue));
 	//RepNotify = “收到网络同步数据包之后” 的回调。谁收到同步包，谁执行；本机直接改值，不触发。
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PickupCount: %d"), PickupCount));
+}
+
+void AMP_CPPCharacter::Client_PrintMessage_Implementation(const FString& Message)
+{
+	FString MessageString = HasAuthority() ? "Server" : "Client";
+	MessageString += Message;
+
+	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Yellow, MessageString);
 }
 
 //////////////////////////////////////////////////////////////////////////
