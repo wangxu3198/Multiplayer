@@ -35,4 +35,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float ArmorValue = 100.f;
+
+	UFUNCTION(Client, Reliable)
+	void Client_PrintActorName();
 };

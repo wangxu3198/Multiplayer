@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Net/UnrealNetwork.h"
+#include <Actors/MP_Actor.h>
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -107,10 +108,15 @@ void AMP_CPPCharacter::OnRPCDelayTimer()
 	//在Begin中执行时都在服务器运行
 	//有时开始播放太早，还没有拥有网络连接。我们必须确保已建立连接，以确保RPC正常工作。
 	//具体方法取决于游戏和玩法机制，我们将简单设置一个计时器，在八秒后运行此函数
-	if (HasAuthority()) {
+	/*if (HasAuthority()) {
 
 		Client_PrintMessage("This should run on owning client.");
-	}
+	}*/
+	if (!HasAuthority()) return;
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	GetWorld()->SpawnActor<AMP_Actor>(GetActorLocation(), GetActorRotation(), SpawnParams);
 }
 
 void AMP_CPPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

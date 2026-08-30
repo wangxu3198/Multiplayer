@@ -41,6 +41,18 @@ void AMP_Actor::BeginPlay()
 	//Get NetRole
 	const ENetRole localRole = GetLocalRole();
 
+	if (bAuth) {
+		Client_PrintActorName();
+	}
+
+}
+
+void AMP_Actor::Client_PrintActorName_Implementation()
+{
+	FString MessageString = HasAuthority() ? "Server" : "Client";
+	MessageString += GetName();
+
+	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Yellow, MessageString);
 }
 
 // Called every frame
