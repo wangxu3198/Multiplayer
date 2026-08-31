@@ -79,6 +79,8 @@ void AMP_CPPCharacter::Jump()
 {
 	Super::Jump();
 
+	Server_PrintMessage(FString());
+
 	//Server RPC
 	Server_PrintMessage("This should run on owning Server.");
 
@@ -165,6 +167,13 @@ void AMP_CPPCharacter::OnRep_PickupCount(int PreviousValue)
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("PreviousValue: %d"), PreviousValue));
 	//RepNotify = “收到网络同步数据包之后” 的回调。谁收到同步包，谁执行；本机直接改值，不触发。
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PickupCount: %d"), PickupCount));
+}
+
+//如果任何原因返回false，关联的客户端将被踢出（将从服务器移除）
+bool AMP_CPPCharacter::Server_PrintMessage_Validate(const FString& Message)
+{
+	//例如：若想向服务器发送并验证消息。假设某个特定值将导致验证失败，此时返回false。
+	return !Message.IsEmpty();
 }
 
 void AMP_CPPCharacter::Multicast_PrintMessage_Implementation(const FString& Message)
