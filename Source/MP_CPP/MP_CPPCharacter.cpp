@@ -116,17 +116,22 @@ void AMP_CPPCharacter::OnRPCDelayTimer()
 		Client_PrintMessage("This should run on owning client.");
 	}*/
 
-	if (!HasAuthority()) return;
+	/*if (!HasAuthority()) return;
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
-	GetWorld()->SpawnActor<AMP_Actor>(GetActorLocation(), GetActorRotation(), SpawnParams);
+	GetWorld()->SpawnActor<AMP_Actor>(GetActorLocation(), GetActorRotation(), SpawnParams);*/
 	
 	//注意Host（监听服务器下的主机）HasAuthority() == true
 	/*if (!HasAuthority()) {
 
 		Server_PrintMessage("This should run on owning Server.");
 	}*/
+
+	if (HasAuthority()) {
+
+		Multicast_PrintMessage("This should run on owning Server and all relevant client.");
+	}
 }
 
 void AMP_CPPCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -160,6 +165,14 @@ void AMP_CPPCharacter::OnRep_PickupCount(int PreviousValue)
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("PreviousValue: %d"), PreviousValue));
 	//RepNotify = “收到网络同步数据包之后” 的回调。谁收到同步包，谁执行；本机直接改值，不触发。
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("PickupCount: %d"), PickupCount));
+}
+
+void AMP_CPPCharacter::Multicast_PrintMessage_Implementation(const FString& Message)
+{
+	FString MessageString = HasAuthority() ? "Server" : "Client";
+	MessageString += Message;
+
+	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Purple, MessageString);
 }
 
 void AMP_CPPCharacter::Server_PrintMessage_Implementation(const FString& Message)

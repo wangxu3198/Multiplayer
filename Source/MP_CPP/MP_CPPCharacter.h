@@ -156,5 +156,8 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void Server_PrintMessage(const FString& Message);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PrintMessage(const FString& Message);
 };
 
