@@ -41,10 +41,43 @@ void AMP_Actor::BeginPlay()
 	//Get NetRole
 	const ENetRole localRole = GetLocalRole();
 
-	if (bAuth) {
-		Client_PrintActorName();
+}
+
+void AMP_Actor::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+	// ========== 客户端本地打印，不走网络，用来观察回调有没有执行 ==========
+	FString RoleStr;
+	switch (GetLocalRole())
+	{
+	case ROLE_Authority:
+		RoleStr = TEXT("Authority");
+		break;
+	case ROLE_AutonomousProxy:
+		RoleStr = TEXT("AutonomousProxy");
+		break;
+	case ROLE_SimulatedProxy:
+		RoleStr = TEXT("SimulatedProxy");
+		break;
+	default:
+		RoleStr = TEXT("Unknown");
+		break;
 	}
 
+	// 青色：只在当前这个客户端窗口输出，用来证明 OnRep_Owner 是否执行
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Cyan,
+		FString::Printf(TEXT("【OnRep_Owner】执行，LocalRole = %s"), *RoleStr));
+
+	// 发起Server RPC
+	Server_PrintActorName();
+}
+
+void AMP_Actor::Server_PrintActorName_Implementation()
+{
+	FString MessageString = HasAuthority() ? "Server" : "Client";
+	MessageString += GetName();
+
+	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Yellow, MessageString);
 }
 
 void AMP_Actor::Client_PrintActorName_Implementation()

@@ -153,5 +153,8 @@ private:
 	//Client_PrintMessage_Implementation：实现的名
 	UFUNCTION(Client, Reliable)
 	void Client_PrintMessage(const FString& Message);
+
+	UFUNCTION(Server, Reliable)
+	void Server_PrintMessage(const FString& Message);
 };
 

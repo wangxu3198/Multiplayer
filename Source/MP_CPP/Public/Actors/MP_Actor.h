@@ -26,6 +26,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// AActor
+	virtual void OnRep_Owner() override;
+
 private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> SphereMesh;
@@ -38,4 +41,7 @@ private:
 
 	UFUNCTION(Client, Reliable)
 	void Client_PrintActorName();
+
+	UFUNCTION(Server, Reliable)
+	void Server_PrintActorName();
 };
