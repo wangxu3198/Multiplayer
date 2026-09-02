@@ -13,6 +13,7 @@ class AMP_CPPGameMode : public AGameModeBase
 
 public:
 	AMP_CPPGameMode();
+
 };
 
 

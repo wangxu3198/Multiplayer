@@ -12,6 +12,8 @@
 #include "InputActionValue.h"
 #include "Net/UnrealNetwork.h"
 #include <Actors/MP_Actor.h>
+#include "Kismet/GameplayStatics.h"
+#include <Game/MP_GameState.h>
 
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -79,15 +81,31 @@ void AMP_CPPCharacter::Jump()
 {
 	Super::Jump();
 
-	Server_PrintMessage(FString());
+	AMP_GameState* MP_GameState = Cast<AMP_GameState>(UGameplayStatics::GetGameState(this));
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+
+	if (IsValid(MP_GameState) && IsValid(PlayerController)) {
+		FString Team = "Team";
+		if (MP_GameState->IsTeamOne(PlayerController)) {
+			Team += "One";
+		}
+		else {
+			Team += "Two";
+		}
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, Team);
+	}
+
+
+
+	/*Server_PrintMessage(FString());*/
 
 	//Server RPC
-	Server_PrintMessage("This should run on owning Server.");
+	/*Server_PrintMessage("This should run on owning Server.");*/
 
-	if (!HasAuthority()) return;
+	/*if (!HasAuthority()) return;
 	bReplicatePickupCount = !bReplicatePickupCount;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("bReplicatePickupCount: %d"), bReplicatePickupCount));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("bReplicatePickupCount: %d"), bReplicatePickupCount));*/
 }
 
 void AMP_CPPCharacter::BeginPlay()
